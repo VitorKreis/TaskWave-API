@@ -36,9 +36,8 @@ O projeto foi pensado como uma ferramenta escalável e segura, com arquitetura e
 ---
 
 ## 🔧 Como rodar localmente
-bash
-Copiar
-Editar
+
+```
 # Clone o repositório
 git clone https://github.com/seu-usuario/taskwave-api.git
 cd taskwave-api
@@ -46,7 +45,8 @@ cd taskwave-api
 # Configure o application.yml com seus dados do PostgreSQL
 
 # Rode com Maven ou sua IDE
-./mvnw spring-boot:run
+ ./mvnw spring-boot:run
+```
 ---
 
 ## 📄 Documentação da API
