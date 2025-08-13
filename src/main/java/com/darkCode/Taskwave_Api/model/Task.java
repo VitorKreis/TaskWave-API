@@ -2,23 +2,46 @@ package com.darkCode.Taskwave_Api.model;
 
 import jakarta.persistence.*;
 
+import java.util.Date;
+
 @Entity
 @Table(name = "Task")
 public class Task {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id")
     private String id;
 
-    @Column(name = "name")
-    private String name;
+    private String title;
 
-    @Column(name = "description")
     private String description;
 
-    @Column(name = "done")
-    private Boolean done;
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    @Enumerated(EnumType.STRING)
+    private Priority priority;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date delivery_date;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private Users user_id;
+
+    @ManyToOne
+    @JoinColumn(name = "project_id")
+    private Project project_id;
+
+    private boolean done;
+
+    public boolean isDone() {
+        return done;
+    }
+
+    public void setDone(boolean done) {
+        this.done = done;
+    }
 
     public String getId() {
         return id;
@@ -28,12 +51,12 @@ public class Task {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getTitle() {
+        return title;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getDescription() {
@@ -44,11 +67,43 @@ public class Task {
         this.description = description;
     }
 
-    public Boolean getDone() {
-        return done;
+    public Status getStatus() {
+        return status;
     }
 
-    public void setDone(Boolean done) {
-        this.done = done;
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public Priority getPriority() {
+        return priority;
+    }
+
+    public void setPriority(Priority priority) {
+        this.priority = priority;
+    }
+
+    public Users getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(Users user_id) {
+        this.user_id = user_id;
+    }
+
+    public Project getProject_id() {
+        return project_id;
+    }
+
+    public void setProject_id(Project project_id) {
+        this.project_id = project_id;
+    }
+
+    public Date getDelivery_date() {
+        return delivery_date;
+    }
+
+    public void setDelivery_date(Date delivery_date) {
+        this.delivery_date = delivery_date;
     }
 }

@@ -26,21 +26,21 @@ public class TaskController {
 
         var tasks = service.getAll();
 
-        return new ResponseEntity(tasks, HttpStatus.OK);
+        return new ResponseEntity<>(tasks, HttpStatus.OK);
     }
 
 
     @PostMapping
     public ResponseEntity<Task> create(@RequestBody Task task){
         var response = service.create(task);
-        return new ResponseEntity(response, HttpStatus.CREATED);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping
     public ResponseEntity<Task> update(@RequestParam("id") String id) throws Exception {
         var response = service.update(id);
 
-        return new ResponseEntity(response, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 
