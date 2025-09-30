@@ -1,57 +1,74 @@
 package com.darkCode.Taskwave_Api.controller;
 
+
 import com.darkCode.Taskwave_Api.model.Task;
-import com.darkCode.Taskwave_Api.repository.TaskRepository;
+import com.darkCode.Taskwave_Api.model.dto.TaskDTO;
+import com.darkCode.Taskwave_Api.model.dto.TaskResponse;
+import com.darkCode.Taskwave_Api.model.dto.UpdateTaskDTO;
+import com.darkCode.Taskwave_Api.model.repository.TaskRepositoy;
 import com.darkCode.Taskwave_Api.service.TaskService;
-import org.springframework.http.HttpStatus;
+import jakarta.validation.GroupSequence;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("tasks")
+@RequestMapping("task")
 public class TaskController {
 
-    private TaskService service;
+    TaskService service;
 
     public TaskController(TaskService service) {
         this.service = service;
     }
 
 
+    @PostMapping
+    public ResponseEntity<Task> create(@RequestBody TaskDTO task, UriComponentsBuilder uriComponentsBuilder){
+
+        var res = service.create(task);
+
+        var uri = uriComponentsBuilder.path("/user/{id}").buildAndExpand(res.getId()).toUri();
+
+        return ResponseEntity.created(uri).body(res);
+    }
+
     @GetMapping
     public ResponseEntity<List<Task>> getAll(){
 
-        var tasks = service.getAll();
+        var res = service.getAll();
 
-        return new ResponseEntity<>(tasks, HttpStatus.OK);
+        return ResponseEntity.ok(res);
+
     }
 
 
-    @PostMapping
-    public ResponseEntity<Task> create(@RequestBody Task task){
-        var response = service.create(task);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    @GetMapping("/{id}")
+    public ResponseEntity<TaskResponse> getOne(@PathVariable UUID id){
+
+        var res = service.getOne(id);
+
+        return ResponseEntity.ok(new TaskResponse(res));
     }
 
-    @PutMapping
-    public ResponseEntity<Task> update(@RequestParam("id") String id) throws Exception {
-        var response = service.update(id);
+    @PutMapping("/{id}")
+    public ResponseEntity<TaskResponse> update(@PathVariable UUID id, @RequestBody UpdateTaskDTO body){
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        var res = service.update(id, body);
+
+        return ResponseEntity.ok(new TaskResponse(res));
     }
 
 
-    @DeleteMapping
-    public ResponseEntity delete (@RequestParam("id") String id) throws Exception{
+    @DeleteMapping("/{id}")
+    public ResponseEntity delete(@PathVariable UUID id){
         service.delete(id);
 
-        return new ResponseEntity("Deletado com sucesso", HttpStatus.OK);
-
+        return ResponseEntity.ok("Task deletada com sucesso");
     }
-
 
 
 

@@ -1,55 +1,73 @@
 package com.darkCode.Taskwave_Api.service;
 
+import com.darkCode.Taskwave_Api.model.Status;
 import com.darkCode.Taskwave_Api.model.Task;
-import com.darkCode.Taskwave_Api.repository.TaskRepository;
+import com.darkCode.Taskwave_Api.model.dto.TaskDTO;
+import com.darkCode.Taskwave_Api.model.dto.UpdateTaskDTO;
+import com.darkCode.Taskwave_Api.model.repository.TaskRepositoy;
+import com.darkCode.Taskwave_Api.model.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class TaskService {
 
-    private TaskRepository repository;
+    TaskRepositoy repositoy;
+
+    UserRepository userRepository;
+
+    public TaskService(TaskRepositoy repositoy, UserRepository userRepository) {
+        this.repositoy = repositoy;
+        this.userRepository = userRepository;
+    }
 
 
-    public TaskService(TaskRepository repository) {
-        this.repository = repository;
+    public Task create(TaskDTO body){
+        var task = new Task(body);
+
+        var user = userRepository.findById(body.user())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + body.user()));
+
+        task.setUser(user);
+
+        repositoy.save(task);
+
+        return task;
     }
 
 
     public List<Task> getAll(){
-        return repository.findAll();
+        return repositoy.findAll();
     }
 
-    public Task create(Task task){
-        var Task = task;
-        Task.setDone(false);
-        return repository.save(Task);
-    }
-
-
-    public Task update(String id) throws Exception {
-        var task = repository.findById(id);
-
-        if(!task.isPresent()){
-            throw new Exception("Task com esse id nao encontrada!!");
-        }
-
-        task.get().setDone(true);
-        repository.save(task.get());
-
-        return task.get();
+    public Task getOne(UUID id){
+        return repositoy.getReferenceById(id);
     }
 
 
-    public void delete(String id) throws Exception {
-        var task = repository.findById(id);
+    public Task update(UUID id, UpdateTaskDTO taskDTO){
+        var task = repositoy.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Task not found with id: " + id));
 
-        if(!task.isPresent()){
-            throw new Exception("Task com esse id nao encontrada!!");
-        }
 
-        repository.delete(task.get());
+        task.setName(taskDTO.name());
+        task.setDescription(taskDTO.description());
+        task.setStatus(taskDTO.status());
 
+
+        return repositoy.save(task);
     }
+
+
+    public void delete(UUID id){
+        repositoy.deleteById(id);
+    }
+
+
+
+
+
 }

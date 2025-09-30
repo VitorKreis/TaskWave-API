@@ -1,92 +1,45 @@
 package com.darkCode.Taskwave_Api.model;
 
+import com.darkCode.Taskwave_Api.model.dto.ProjectDTO;
 import jakarta.persistence.*;
-import jdk.jfr.Timespan;
+import lombok.Data;
 
-import java.util.Date;
-import java.util.List;
+import java.util.UUID;
 
-@Entity
+@Data
 @Table(name = "Project")
+@Entity
 public class Project {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "project_id")
+    private UUID id;
 
+    @Column(name="name")
     private String name;
 
+    @Column(name = "description")
     private String description;
 
-    @OneToOne
-    @JoinColumn(name = "resposible_id")
-    private Users resposible;
+    @Column(name = "project_ativo")
+    private Boolean ativo;
 
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "responsavel_id")
+    private User responsavel;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date created_at;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updated_at;
-
-    @OneToMany
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
-    private List<Users> users_id;
+    private User user;
 
 
-    public Long getId() {
-        return id;
+    public Project(ProjectDTO dto){
+        this.name = dto.name();
+        this.description = dto.description();
+        this.ativo = Boolean.TRUE;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
-    public String getName() {
-        return name;
-    }
+    protected Project(){}
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Users getResposible() {
-        return resposible;
-    }
-
-    public void setResposible(Users resposible) {
-        this.resposible = resposible;
-    }
-
-    public Date getCreated_at() {
-        return created_at;
-    }
-
-    public void setCreated_at(Date created_at) {
-        this.created_at = created_at;
-    }
-
-    public Date getUpdated_at() {
-        return updated_at;
-    }
-
-    public void setUpdated_at(Date updated_at) {
-        this.updated_at = updated_at;
-    }
-
-    public List<Users> getUsers_id() {
-        return users_id;
-    }
-
-    public void setUsers_id(List<Users> users_id) {
-        this.users_id = users_id;
-    }
 }

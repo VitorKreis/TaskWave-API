@@ -1,55 +1,30 @@
 package com.darkCode.Taskwave_Api.service;
 
 
-import com.darkCode.Taskwave_Api.model.DTO.LoginDTO;
-import com.darkCode.Taskwave_Api.model.DTO.UserDTO;
-import com.darkCode.Taskwave_Api.model.Users;
-import com.darkCode.Taskwave_Api.repository.UserRepository;
+import com.darkCode.Taskwave_Api.model.Role;
+import com.darkCode.Taskwave_Api.model.User;
+import com.darkCode.Taskwave_Api.model.dto.UpdataUserDTO;
+import com.darkCode.Taskwave_Api.model.dto.UserDTO;
+import com.darkCode.Taskwave_Api.model.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
 
-    private final UserRepository repository;
+    private UserRepository repository;
 
     public UserService(UserRepository repository) {
-
         this.repository = repository;
     }
 
-    public Users create(UserDTO user){
-        var users = new Users(user);
+    public User create(UserDTO user){
+        var User = new User(user);
 
-        repository.save(users);
-
-        return users;
-
-    }
-
-    public List<Users> GetAll(){
-        return repository.findAll();
-    }
-
-    public Users GetByID(Long id){
-        return repository.findById(id).get();
-    }
-
-
-    public Users update(Long id, UserDTO user){
-        var User = repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado"));
-
-
-        User.setName(user.name());
-        User.setEmail(user.email());
-        if(!Objects.equals(User.getPassword_hash(), user.password())){
-            User.setPassword_hash(user.password());
-        }
+        User.setRole(Role.USER);
 
         repository.save(User);
 
@@ -57,25 +32,47 @@ public class UserService {
     }
 
 
-    public void delete(Long id){
-        repository.deleteById(id);
+    public User getOne(UUID id){
+
+        return repository.getReferenceById(id);
     }
 
 
-    public Optional<Users> login(LoginDTO login) throws Exception {
+    public List<User> getAll(){
+        return repository.findAll();
+    }
 
-        var user = repository.findByEmail(login.Email());
 
-        if(user.isEmpty() || user.isPresent()){
-            throw new EntityNotFoundException("Usuário não encontrado");
+    public User update(UpdataUserDTO body, UUID id) throws Exception {
+
+        var user = repository.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+
+
+        if (body.name() != null && !body.name().isBlank()) {
+            user.setName(body.name());
         }
 
-        if(!Objects.equals(user.get().getPassword_hash(), login.Password())){
-            throw new Exception("Senha nao conhecide");
+        if (body.role() != null) {
+            user.setRole(body.role());
         }
 
-        return user;
+        if (body.email() != null && !body.email().isBlank()) {
+            user.setEmail(body.email());
+        }
 
+
+        return repository.save(user);
+
+    }
+
+
+
+    public void delete(UUID id){
+        var user = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + id));
+
+        repository.delete(user);
     }
 
 
